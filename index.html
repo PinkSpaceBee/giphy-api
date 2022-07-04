@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+    <div id="form"> 
+        <input type="search" id="query" placeholder="birb">
+        <button id="search-btn">Search</button>
+    </div>
+    <div id="gif-wrap">
+      <p id="error-msg"></p>
+      <img src="#">
+      <button id="new-gif">Get a new cat gif</button>
+    </div>
+  <script>
+    // default gif
+    const img = document.querySelector('img');
+
+    fetch('https://api.giphy.com/v1/gifs/translate?api_key=87QJiYaVnp6isLX6dfCcsb383Ne8rgCC&s=cats', {mode: 'cors'})
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(response) {
+        img.src = response.data.images.original.url;
+      });
+
+      // show a random cat gif
+      const newGifBtn = document.querySelector('#new-gif');
+
+      newGifBtn.addEventListener('click', () => {
+        const url = `https://api.giphy.com/v1/gifs/translate?api_key=87QJiYaVnp6isLX6dfCcsb383Ne8rgCC&s=cat`;
+
+        fetch(url, {mode: 'cors'})
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(response) {
+          img.src = response.data.images.original.url;
+          document.querySelector('#error-msg').textContent = '';
+        });
+      })
+
+      // search for gifs 
+      const searchBtn = document.querySelector('#search-btn');
+
+      searchBtn.addEventListener('click', () => {
+
+        const searchQuery = document.querySelector('#query').value;
+        const url = `https://api.giphy.com/v1/gifs/search?api_key=87QJiYaVnp6isLX6dfCcsb383Ne8rgCC&q=${searchQuery}`;
+        
+        fetch(url, {mode: 'cors'})
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(response) {
+          // 50 because it's the response.data.length. idk why. so I just choose a random gif 
+          img.src = response.data[Math.floor(Math.random() * 50)].images.original.url;
+          document.querySelector('#error-msg').textContent = '';
+        })
+        .catch(error => {
+          console.log(`couldn't find a gif with such a query`);
+          // add a text node with a message
+          document.querySelector('#error-msg').textContent=`Sorry, we couldn't find a gif that matches your query, but look at this cute cat instead!`;
+
+          fetch(`https://api.giphy.com/v1/gifs/translate?api_key=87QJiYaVnp6isLX6dfCcsb383Ne8rgCC&s=cat`, {mode: 'cors'})
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(response) {
+            img.src = response.data.images.original.url;
+          });
+
+        });
+      })
+
+  </script>
+</body>
+</html>
